@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model campaign_items {
+  campaign_item_id       Int       @id @default(autoincrement())
+  campaign_id            String    @db.Uuid
+  campaign_item_name     String
+  campaign_item_quantity Int
+  created_at             DateTime? @default(now()) @db.Timestamp(6)
+  campaigns              campaigns @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model campaigns {
+  campaign_id       String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  campaign_owner_id String?          @db.Uuid
+  campaign_title    String           @unique(map: "campaigns_un")
+  campaign_desc     String?
+  created_at        DateTime?        @default(now()) @db.Timestamp(6)
+  delivery_address  String           @default("empty")
+  end_date          DateTime         @default(now()) @db.Date
+  campaign_type     String?
+  contact           String
+  users             users?           @relation(fields: [campaign_owner_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "campaigns_owner_id_fkey")
+  campaign_items    campaign_items[]
+  donations         donations[]
+}
+
+model donations {
+  donation_id        String     @id(map: "donation_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  donation_owner_id  String?    @db.Uuid
+  campaign_id        String?    @db.Uuid
+  item_name          String
+  item_quantity      Int
+  created_at         DateTime?  @default(now()) @db.Timestamp(6)
+  first_name         String?
+  second_name        String?
+  email              String?
+  donations_received Int?
+  campaigns          campaigns? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade, onUpdate: NoAction, map: "campaign_id_fkey")
+  users              users?     @relation(fields: [donation_owner_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "donation_id_fkey")
+}
+
+model users {
+  user_id    String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username   String      @unique @db.VarChar(50)
+  password   String
+  email      String      @unique @db.VarChar(255)
+  created_at DateTime?   @default(now()) @db.Timestamp(6)
+  campaigns  campaigns[]
+  donations  donations[]
+}
