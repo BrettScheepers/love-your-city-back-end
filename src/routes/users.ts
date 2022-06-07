@@ -41,8 +41,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-// validToken,
-router.get("/:id",  async (req, res) => {
+router.get("/:id", validToken, async (req, res) => {
   try {
     const campaigns = await prisma.$queryRaw`
       WITH donation_sums as (

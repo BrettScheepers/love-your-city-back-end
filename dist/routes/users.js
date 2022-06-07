@@ -16,6 +16,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const token_1 = require("../lib/token");
 const express_1 = __importDefault(require("express"));
 const client_1 = require("@prisma/client");
+const validate_1 = require("../middleware/validate");
 const router = express_1.default.Router();
 const prisma = new client_1.PrismaClient();
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,8 +52,7 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json({ error: "Error occured. Please try again later." });
     }
 }));
-// validToken,
-router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/:id", validate_1.validToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const campaigns = yield prisma.$queryRaw `
       WITH donation_sums as (
