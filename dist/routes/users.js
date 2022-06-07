@@ -28,7 +28,6 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 password: hashedPassword
             }
         });
-        console.log('server user', user);
         return res.status(200).json({
             acessToken: (0, token_1.token)({
                 user_id: user.user_id,
@@ -49,6 +48,42 @@ router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (err.message.includes('Unique constraint failed on the fields: (`email`)')) {
             return res.status(400).json({ error: 'Email already taken. Please use another.' });
         }
+        return res.status(500).json({ error: "Error occured. Please try again later." });
+    }
+}));
+// validToken,
+router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const campaigns = yield prisma.$queryRaw `
+      WITH donation_sums as (
+          SELECT 
+            campaign_id, 
+            sum(item_quantity) as donations_item_quantity
+          FROM donations
+          GROUP BY campaign_id
+        ), campaign_item_sums as (
+          SELECT 
+            campaign_id, 
+            sum(campaign_item_quantity) as campaign_items_item_quantity
+          FROM campaign_items
+          GROUP BY campaign_id
+        )
+
+      SELECT 
+        campaigns.campaign_id, campaigns.campaign_title, campaigns.campaign_desc, campaigns.end_date, 
+        campaign_item_sums.campaign_items_item_quantity,
+        donation_sums.donations_item_quantity
+      FROM campaigns
+        JOIN donation_sums
+          ON campaigns.campaign_id = donation_sums.campaign_id
+        JOIN campaign_item_sums
+          ON campaigns.campaign_id = campaign_item_sums.campaign_id
+      WHERE campaigns.campaign_owner_id = ${req.params.id}
+    `;
+        return res.status(200).json({ campaigns: campaigns });
+    }
+    catch (error) {
+        console.log(error);
         return res.status(500).json({ error: "Error occured. Please try again later." });
     }
 }));
