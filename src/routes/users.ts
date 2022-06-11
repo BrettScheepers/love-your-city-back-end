@@ -72,7 +72,6 @@ router.get("/:id", validToken, async (req, res) => {
 
     return res.status(200).json({ campaigns: campaigns })
   } catch (error) {
-    console.log(error)
     return res.status(500).json({ error: "Error occured. Please try again later." })
   }
 })
