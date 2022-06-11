@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     })
 
     return res.status(200).json({ 
-      acessToken: token({
+      accessToken: token({
         user_id: user.user_id,
         username: user.username,
         email: user.email,

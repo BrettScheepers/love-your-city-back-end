@@ -31,7 +31,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!(yield bcrypt_1.default.compare(password, user.password)))
             throw new Error('Incorrect password. Please retry with a correct password.');
         return res.status(200).json({
-            acessToken: (0, token_1.token)({
+            accessToken: (0, token_1.token)({
                 user_id: user.user_id,
                 username: user.username,
                 email: user.email,
