@@ -58,25 +58,25 @@ router.get("/:id", validate_1.validToken, (req, res) => __awaiter(void 0, void 0
       WITH donation_sums as (
           SELECT 
             campaign_id, 
-            sum(item_quantity) as donations_item_quantity
+            SUM(item_quantity) as donations_item_quantity
           FROM donations
           GROUP BY campaign_id
         ), campaign_item_sums as (
           SELECT 
             campaign_id, 
-            sum(campaign_item_quantity) as campaign_items_item_quantity
+            SUM(campaign_item_quantity) as campaign_items_item_quantity
           FROM campaign_items
           GROUP BY campaign_id
         )
 
       SELECT 
         campaigns.campaign_id, campaigns.campaign_title, campaigns.campaign_desc, campaigns.end_date, 
-        campaign_item_sums.campaign_items_item_quantity,
-        donation_sums.donations_item_quantity
+        COALESCE(campaign_item_sums.campaign_items_item_quantity,0) as campaign_items_item_quantity,
+	      COALESCE(donation_sums.donations_item_quantity,0) as donations_item_quantity
       FROM campaigns
-        JOIN donation_sums
+        LEFT JOIN donation_sums
           ON campaigns.campaign_id = donation_sums.campaign_id
-        JOIN campaign_item_sums
+        LEFT JOIN campaign_item_sums
           ON campaigns.campaign_id = campaign_item_sums.campaign_id
       WHERE campaigns.campaign_owner_id = ${req.params.id}
     `;

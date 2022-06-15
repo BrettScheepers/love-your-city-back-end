@@ -41,7 +41,7 @@ model donations {
   first_name         String?
   second_name        String?
   email              String?
-  donations_received Int?
+  donations_received Int?       @default(0)
   campaigns          campaigns? @relation(fields: [campaign_id], references: [campaign_id], onDelete: Cascade, onUpdate: NoAction, map: "campaign_id_fkey")
   users              users?     @relation(fields: [donation_owner_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "donation_id_fkey")
 }
